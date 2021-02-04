@@ -4,6 +4,15 @@
 
 package edu.neu.coe.info6205.util;
 
+import edu.neu.coe.info6205.sort.BaseHelper;
+import edu.neu.coe.info6205.sort.Sort;
+import edu.neu.coe.info6205.sort.simple.InsertionSort;
+
+import java.lang.reflect.Array;
+import java.net.Inet4Address;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Random;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -30,6 +39,50 @@ import static edu.neu.coe.info6205.util.Utilities.formatWhole;
  * @param <T> The generic type T is that of the input to the function f which you will pass in to the constructor.
  */
 public class Benchmark_Timer<T> implements Benchmark<T> {
+    private static Integer[] Reverse_Array = new Integer[100000];
+    private static Random rand = new Random();
+    private static InsertionSort is = new InsertionSort();
+
+
+    public static void main(String args[]){
+
+        final Supplier<Integer[]> reverseSorted = () -> {
+            Integer[] result = (Integer[]) Array.newInstance(Integer.class, 2000);
+            for (int i = 1; i <= 2000; i++) result[i-1] = 2001-i;
+            return result;
+        };
+
+        final Supplier<Integer[]> sortedArray = () -> {
+            Integer[] result = (Integer[]) Array.newInstance(Integer.class, 2000);
+            for (int i = 0; i < 2000; i++) result[i] = i;
+            return result;
+        };
+
+        final Supplier<Integer[]> randomArray = () -> {
+            Integer[] result = (Integer[]) Array.newInstance(Integer.class, 2000);
+            for (int i = 0; i < 2000; i++) result[i] = rand.nextInt();
+            return result;
+        };
+
+        final Supplier<Integer[]> partial = () -> {
+            Integer[] result = (Integer[]) Array.newInstance(Integer.class, 2000);
+            for (int i = 0; i < 1000; i++) result[i] = i;
+            for( int i= 1000; i < 2000; i++)  result[i] = (int)rand.nextInt(2000);
+            return result;
+        };
+
+        Benchmark_Timer <Integer[]> benchmark_timer = new Benchmark_Timer<Integer[]>(
+                "Insertion Sort",
+                null,
+                new InsertionSort()::sort,
+                null
+        );
+
+        System.out.println("For a Sorted Array the time took in milliseconds "+benchmark_timer.run(sortedArray.get(),200));
+        System.out.println("For a Partially Array the time took in milliseconds "+benchmark_timer.run(partial.get(),200));
+        System.out.println("For a Random Array the time took in milliseconds "+benchmark_timer.run(randomArray.get(),200));
+        System.out.println("For a Reverse Array the time took in milliseconds "+benchmark_timer.run(reverseSorted.get(),200));
+    }
 
     /**
      * Calculate the appropriate number of warmup runs.
@@ -113,7 +166,8 @@ public class Benchmark_Timer<T> implements Benchmark<T> {
      *
      * @param description the description of the benchmark.
      * @param f           a Consumer function (i.e. a function of T => Void).
-     *                    Function f is the function whose timing you want to measure. For example, you might create a function which sorts an array.
+     *                    Function f is the function whose timing you want to measure.
+     *                    For example, you might create a function which sorts an array.
      */
     public Benchmark_Timer(String description, Consumer<T> f) {
         this(description, null, f, null);
@@ -123,6 +177,5 @@ public class Benchmark_Timer<T> implements Benchmark<T> {
     private final UnaryOperator<T> fPre;
     private final Consumer<T> fRun;
     private final Consumer<T> fPost;
-
     final static LazyLogger logger = new LazyLogger(Benchmark_Timer.class);
 }

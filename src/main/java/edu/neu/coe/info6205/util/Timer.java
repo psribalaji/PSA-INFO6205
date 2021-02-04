@@ -1,5 +1,6 @@
 package edu.neu.coe.info6205.util;
 
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -43,7 +44,8 @@ public class Timer {
     }
 
     /**
-     * Pause (without counting a lap); run the given functions n times while being timed, i.e. once per "lap", and finally return the result of calling meanLapTime().
+     * Pause (without counting a lap); run the given functions n times while being timed,
+     * i.e. once per "lap", and finally return the result of calling meanLapTime().
      *
      * @param n            the number of repetitions.
      * @param supplier     a function which supplies a T value.
@@ -52,10 +54,25 @@ public class Timer {
      * @param postFunction a function which consumes a U and which succeeds the call of function, but which is not timed (may be null).
      * @return the average milliseconds per repetition.
      */
-    public <T, U> double repeat(int n, Supplier<T> supplier, Function<T, U> function, UnaryOperator<T> preFunction, Consumer<U> postFunction) {
+    public <T, U> double repeat(int n, Supplier<T> supplier, Function<T, U> function, UnaryOperator<T> preFunction,
+                                Consumer<U> postFunction) {
         logger.trace("repeat: with " + n + " runs");
-        // TO BE IMPLEMENTED: note that the timer is running when this method is called and should still be running when it returns.
-        throw new UnsupportedOperationException();
+        // TO BE IMPLEMENTED: note that the timer is running when this method is called and
+        // should still be running when it returns.
+        pause();
+        T t = supplier.get();
+        for(int i=1 ; i <= n ; i++) {
+            if(preFunction!=null) {
+                t = preFunction.apply(t);
+            }
+            resume();
+            U fun = function.apply(t);
+            lap();
+            pause();
+            if (postFunction != null)
+               postFunction.accept(fun);
+        }
+        return meanLapTime();
     }
 
     /**
@@ -149,6 +166,7 @@ public class Timer {
     private int laps = 0;
     private boolean running = false;
 
+
     // NOTE: Used by unit tests
     private long getTicks() {
         return ticks;
@@ -174,8 +192,11 @@ public class Timer {
      */
     private static long getClock() {
         // TO BE IMPLEMENTED
-        throw new UnsupportedOperationException();
-    }
+      //  throw new UnsupportedOperationException();
+        //System.out.println("GCC  "+ System.nanoTime());
+
+        return System.nanoTime();
+   }
 
     /**
      * NOTE: (Maintain consistency) There are two system methods for getting the clock time.
@@ -186,7 +207,12 @@ public class Timer {
      */
     private static double toMillisecs(long ticks) {
         // TO BE IMPLEMENTED
-        throw new UnsupportedOperationException();
+      //  throw new UnsupportedOperationException();
+    //    System.out.println("Ticks "+ticks);
+      //  System.out.println("OP "+ TimeUnit.NANOSECONDS.toMillis(ticks));
+
+        return  TimeUnit.NANOSECONDS.toMillis(ticks);
+       // return  ticks/1000000.0;
     }
 
     final static LazyLogger logger = new LazyLogger(Timer.class);
