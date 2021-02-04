@@ -39,10 +39,7 @@ import static edu.neu.coe.info6205.util.Utilities.formatWhole;
  * @param <T> The generic type T is that of the input to the function f which you will pass in to the constructor.
  */
 public class Benchmark_Timer<T> implements Benchmark<T> {
-    private static Integer[] Reverse_Array = new Integer[100000];
     private static Random rand = new Random();
-    private static InsertionSort is = new InsertionSort();
-
 
     public static void main(String args[]){
 
