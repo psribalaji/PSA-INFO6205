@@ -7,7 +7,11 @@
  */
 package edu.neu.coe.info6205.union_find;
 
-import java.util.Arrays;
+import edu.neu.coe.info6205.bqs.LinkedList;
+import edu.neu.coe.info6205.bqs.Stack;
+
+import java.sql.SQLOutput;
+import java.util.*;
 
 /**
  * Height-weighted Quick Union with Path Compression
@@ -79,10 +83,16 @@ public class UF_HWQUPC implements UF {
      * @throws IllegalArgumentException unless {@code 0 <= p < n}
      */
     public int find(int p) {
+
         validate(p);
         int root = p;
         // TO BE IMPLEMENTED
-        return root;
+        while (root != parent[root])
+            root = parent[root];
+        if (!pathCompression)
+            return root;
+        doPathCompression(p);
+            return root;
     }
 
     /**
@@ -159,6 +169,7 @@ public class UF_HWQUPC implements UF {
      * @return the parent of the component
      */
     private int getParent(int i) {
+
         return parent[i];
     }
 
@@ -169,6 +180,21 @@ public class UF_HWQUPC implements UF {
 
     private void mergeComponents(int i, int j) {
         // TO BE IMPLEMENTED make shorter root point to taller one
+        int rootP = find(i);
+        int rootQ = find(j);
+        if (rootP == rootQ) return;
+
+        // make smaller root point to larger one
+        if (height[rootP] < height[rootQ]) {
+            parent[rootP] = rootQ;
+        }
+        else if(height[rootP] == height[rootQ]){
+            parent[rootQ] = rootP;
+            height[rootP]++;
+        }
+        else {
+            parent[rootQ] = rootP;
+        }
     }
 
     /**
@@ -176,5 +202,32 @@ public class UF_HWQUPC implements UF {
      */
     private void doPathCompression(int i) {
         // TO BE IMPLEMENTED update parent to value of grandparent
+        parent[i] = parent[parent[i]];
+    }
+
+    public static int generatePairs(int N){
+        UF_HWQUPC uf_hwqupc = new UF_HWQUPC(N, true);
+        Random rand = new Random();
+        int m = 0;
+        while(uf_hwqupc.components() != 1) {
+            int r1 = rand.nextInt(N);
+            int r2 = rand.nextInt(N);
+            uf_hwqupc.connect(r1,r2);
+            m++;
+        }
+        return m;
+    }
+
+    public static void main(String args[]){
+        Scanner in = new Scanner(System.in);
+        int N = in.nextInt();
+        Deque<Integer> average = new ArrayDeque<>();
+        for(int i =1 ; i <= 50 ; i++)
+            average.push(generatePairs(N));
+        int avg =0;
+        while (!average.isEmpty()){
+            avg += average.pop();
+        }
+        System.out.println("The Average pairs for N "+ N + " is "+ avg/50);
     }
 }
