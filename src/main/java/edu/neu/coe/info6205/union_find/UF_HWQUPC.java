@@ -222,12 +222,12 @@ public class UF_HWQUPC implements UF {
         Scanner in = new Scanner(System.in);
         int N = in.nextInt();
         Deque<Integer> average = new ArrayDeque<>();
-        for(int i =1 ; i <= 50 ; i++)
+        for(int i =1 ; i <= 5 ; i++)
             average.push(generatePairs(N));
         int avg =0;
         while (!average.isEmpty()){
             avg += average.pop();
         }
-        System.out.println("The Average pairs for N "+ N + " is "+ avg/50);
+        System.out.println("The Average pairs for N "+ N + " is "+ avg/5);
     }
 }
